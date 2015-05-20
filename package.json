@@ -1,0 +1,17 @@
+{
+  "name": "fx-http-proxy",
+  "version": "0.0.1",
+  "main": "./run.js",
+  "engines": {
+    "node": "0.10.*"
+  },
+  "dependencies": {
+    "architect": "0.1.x",
+    "http-proxy": "1.11.x",
+    "fx-logger": "0.1.x",
+    "fx-express": "0.1.x",
+    "fx-middleware": "0.1.x",
+    "fx-eventbus": "0.1.x"
+  },
+  "debug": true
+}
