@@ -3,6 +3,7 @@ var url = require('url');
 var httpProxy = require('http-proxy');
 
 var UpstreamDB = require('./upstreams');
+var AdminApi = require('./admin');
 
 module.exports = function (options, imports, register) {
   // options
@@ -19,12 +20,23 @@ module.exports = function (options, imports, register) {
 
   // init upstream
   var upstreamDB = new UpstreamDB();
+  var adminApi = new AdminApi(upstreamDB);
   upstreamDB.load(function () {
     var handler = function (req, res) {
-      var route = '/' + url.parse(req.url).pathname.split('/')[1];
-      console.log(route);
+      var pathname = url.parse(req.url).pathname;
+
+      if (pathname.lastIndexOf('/proxy/add', 0) == 0) {
+        return adminApi.addUpstream(req, res);
+      } else if (pathname.lastIndexOf('/proxy/remove', 0) == 0) {
+        return adminApi.removeUpstream(req, res);
+      } else if (pathname.lastIndexOf('/proxy/upstream', 0) == 0) {
+        return adminApi.getUpstreams(req, res);
+      }
+
+      var route = '/' + pathname.split('/')[1];
+
       var upstream = upstreamDB.nextUpstream(route);
-      console.log(upstream);
+
       proxy.proxyRequest(req, res, {
         target: upstream
       });

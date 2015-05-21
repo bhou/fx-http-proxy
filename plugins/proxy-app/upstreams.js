@@ -12,7 +12,7 @@ function UpstreamDB() {
 
 UpstreamDB.prototype.notFoundUpstream = function(upstream) {
   this.notFoundUpstream = upstream;
-}
+};
 
 UpstreamDB.prototype.load = function(done) {
   var self = this;
@@ -42,7 +42,7 @@ UpstreamDB.prototype.addUpstream = function(route, upstream, done) {
   }
 
   // save file
-  save(done);
+  this.save(done);
 };
 
 UpstreamDB.prototype.removeUpstream = function(route, upstream, done) {
@@ -56,7 +56,7 @@ UpstreamDB.prototype.removeUpstream = function(route, upstream, done) {
   }
 
   // save file
-  save(done);
+  this.save(done);
 };
 
 UpstreamDB.prototype.getRouteUpstream = function(route) {
