@@ -67,7 +67,7 @@ UpstreamDB.prototype.getAllUpstream = function() {
 
 UpstreamDB.prototype.nextUpstream = function(route) {
   if (!this.upstreams.hasOwnProperty(route) || this.upstreams[route].length == 0) {
-    return this.upstreams['/'];
+    route = '/';
   }
 
   var upstreamList = this.upstreams[route];
@@ -78,7 +78,7 @@ UpstreamDB.prototype.nextUpstream = function(route) {
 
   var index = upstreamList.indexOf(currentUpstream);
   if (index < 0) {
-    return this.upstreams['/'];
+    throw new Error('No upstream found for ' + route );
   }
 
   index = (index + 1) % upstreamList.length;

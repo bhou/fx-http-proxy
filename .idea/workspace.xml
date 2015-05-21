@@ -24,11 +24,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="upstreams.js" pinned="false" current-in-tab="true">
+      <file leaf-file-name="upstreams.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/plugins/proxy-app/upstreams.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.86162364">
-              <caret line="80" column="31" selection-start-line="80" selection-start-column="31" selection-end-line="80" selection-end-column="31" />
+            <state vertical-scroll-proportion="0.0">
+              <caret line="80" column="24" selection-start-line="80" selection-start-column="24" selection-end-line="80" selection-end-column="24" />
               <folding>
                 <element signature="e#0#41#0" expanded="false" />
               </folding>
@@ -36,10 +36,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="index.js" pinned="false" current-in-tab="false">
+      <file leaf-file-name="index.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/plugins/proxy-app/index.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
+            <state vertical-scroll-proportion="-0.42066422">
               <caret line="50" column="44" selection-start-line="50" selection-start-column="32" selection-end-line="50" selection-end-column="44" />
               <folding />
             </state>
@@ -492,7 +492,13 @@
       <option name="project" value="LOCAL" />
       <updated>1432204488162</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="set default proxy">
+      <created>1432205421915</created>
+      <option name="number" value="00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1432205421915</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -530,7 +536,8 @@
     <MESSAGE value="remove try catch error" />
     <MESSAGE value="add log" />
     <MESSAGE value="remove route from proxy request" />
-    <option name="LAST_COMMIT_MESSAGE" value="remove route from proxy request" />
+    <MESSAGE value="set default proxy" />
+    <option name="LAST_COMMIT_MESSAGE" value="set default proxy" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -652,14 +659,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/plugins/proxy-app/index.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="50" column="44" selection-start-line="50" selection-start-column="32" selection-end-line="50" selection-end-column="44" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/upstreams.json">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-1.4193548">
@@ -670,11 +669,19 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/plugins/proxy-app/upstreams.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.86162364">
-          <caret line="80" column="31" selection-start-line="80" selection-start-column="31" selection-end-line="80" selection-end-column="31" />
+        <state vertical-scroll-proportion="0.0">
+          <caret line="80" column="24" selection-start-line="80" selection-start-column="24" selection-end-line="80" selection-end-column="24" />
           <folding>
             <element signature="e#0#41#0" expanded="false" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/plugins/proxy-app/index.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-0.42066422">
+          <caret line="50" column="44" selection-start-line="50" selection-start-column="32" selection-end-line="50" selection-end-column="44" />
+          <folding />
         </state>
       </provider>
     </entry>
