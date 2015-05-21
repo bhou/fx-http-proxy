@@ -3,6 +3,8 @@ function AdminApi(upstreamDb) {
 }
 
 AdminApi.prototype.accept = function (req) {
+  var os = require('os');
+
   var ip = (req.headers['x-forwarded-for'] || '').split(',')[0]
     || req.connection.remoteAddress;
 
@@ -12,6 +14,15 @@ AdminApi.prototype.accept = function (req) {
 
   if (ip == '127.0.0.1') {
     return true;
+  }
+
+  var networkInterfaces = os.networkInterfaces();
+  for (var key in networkInterfaces) {
+    if (networkInterfaces.hasOwnProperty(key)) {
+      if (networkInterfaces[key].address == ip) {
+        return true;
+      }
+    }
   }
 
   return false;
