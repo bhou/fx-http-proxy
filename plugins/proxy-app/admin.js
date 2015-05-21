@@ -12,7 +12,7 @@ AdminApi.prototype.accept = function (req) {
     return false;
   }
 
-  if (ip == '127.0.0.1') {
+  if (ip == '127.0.0.1' || ip.indexOf('127.0.0.1') != -1) {
     return true;
   }
 
