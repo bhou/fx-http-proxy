@@ -55,6 +55,7 @@ module.exports = function (options, imports, register) {
       s.shift();
       var s1 = s.join('/');
       var newUrl = '/' + s1;
+      req.url = newUrl;
       logger.info('proxy to:', upstream + newUrl);
       proxy.proxyRequest(req, res, {
         target: upstream
