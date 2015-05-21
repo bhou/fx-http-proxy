@@ -48,17 +48,9 @@ module.exports = function (options, imports, register) {
 
       var upstream = upstreamDB.nextUpstream(route);
 
-      try {
-        proxy.proxyRequest(req, res, {
-          target: upstream
-        });
-      } catch (e) {
-        logger.error(e);
-        res.end(JSON.stringify({
-          code: 500,
-          data: 'Internal Error'
-        }));
-      }
+      proxy.proxyRequest(req, res, {
+        target: upstream
+      });
 
     };
 
@@ -72,8 +64,6 @@ module.exports = function (options, imports, register) {
       var httpsServer = http.createServer({}, handler).listen(config.securePort);
       logger.info("HTTPS: listening on port", config.securePort);
     }
-
-
 
   });
 
