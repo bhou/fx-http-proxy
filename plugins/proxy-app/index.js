@@ -54,18 +54,5 @@ module.exports = function (options, imports, register) {
     }
   });
 
-
-  http.createServer(function (req, res) {
-    res.end('Hello World 1! ' + req.url);
-  }).listen(8081);
-
-  http.createServer(function (req, res) {
-    res.end('Hello World 2! ' + req.url);
-  }).listen(8082);
-
-  http.createServer(function (req, res) {
-    res.end('Hello World 3! ' + req.url);
-  }).listen(8083);
-
   register(); // provides nothing
 };

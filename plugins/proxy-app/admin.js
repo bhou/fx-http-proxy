@@ -2,7 +2,29 @@ function AdminApi(upstreamDb) {
   this.upstreamDb = upstreamDb;
 }
 
+AdminApi.prototype.accept = function (req) {
+  var ip = (req.headers['x-forwarded-for'] || '').split(',')[0]
+    || req.connection.remoteAddress;
+
+  if (!ip) {
+    return false;
+  }
+
+  if (ip == '127.0.0.1') {
+    return true;
+  }
+
+  return false;
+};
+
 AdminApi.prototype.addUpstream = function (req, res) {
+  if (!this.accept(req)) {
+    return res.end(JSON.stringify({
+      code: 401,
+      data: 'Unauthorized'
+    }));
+  }
+
   var url = require('url');
   var query = url.parse(req.url, true).query;
 
@@ -13,7 +35,7 @@ AdminApi.prototype.addUpstream = function (req, res) {
     }));
   }
 
-  this.upstreamDb.addUpstream(query.route, query.upstream, function() {
+  this.upstreamDb.addUpstream(query.route, query.upstream, function () {
     res.end(JSON.stringify({
       code: 200,
       data: 'OK'
@@ -22,6 +44,13 @@ AdminApi.prototype.addUpstream = function (req, res) {
 };
 
 AdminApi.prototype.removeUpstream = function (req, res) {
+  if (!this.accept(req)) {
+    return res.end(JSON.stringify({
+      code: 401,
+      data: 'Unauthorized'
+    }));
+  }
+
   var url = require('url');
   var query = url.parse(req.url, true).query;
 
@@ -32,7 +61,7 @@ AdminApi.prototype.removeUpstream = function (req, res) {
     }));
   }
 
-  this.upstreamDb.removeUpstream(query.route, query.upstream, function() {
+  this.upstreamDb.removeUpstream(query.route, query.upstream, function () {
     res.end(JSON.stringify({
       code: 200,
       data: 'OK'
@@ -42,6 +71,13 @@ AdminApi.prototype.removeUpstream = function (req, res) {
 
 
 AdminApi.prototype.getUpstreams = function (req, res) {
+  if (!this.accept(req)) {
+    return res.end(JSON.stringify({
+      code: 401,
+      data: 'Unauthorized'
+    }));
+  }
+
   var url = require('url');
   var self = this;
   var query = url.parse(req.url, true).query;
