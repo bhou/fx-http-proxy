@@ -8,12 +8,12 @@ function UpstreamDB() {
   this.nexts = {};
 }
 
-UpstreamDB.prototype.load = function(done) {
+UpstreamDB.prototype.load = function (done) {
   var self = this;
 
   var fs = require('fs');
 
-  fs.exists(JSON_FILE, function(exists) {
+  fs.exists(JSON_FILE, function (exists) {
     if (require.cache.hasOwnProperty(JSON_FILE)) {
       delete require.cache[require.resolve(JSON_FILE)];
     }
@@ -26,7 +26,7 @@ UpstreamDB.prototype.load = function(done) {
   });
 };
 
-UpstreamDB.prototype.addUpstream = function(route, upstream, done) {
+UpstreamDB.prototype.addUpstream = function (route, upstream, done) {
   if (!this.upstreams.hasOwnProperty(route)) {
     this.upstreams[route] = [];
   }
@@ -39,7 +39,7 @@ UpstreamDB.prototype.addUpstream = function(route, upstream, done) {
   this.save(done);
 };
 
-UpstreamDB.prototype.removeUpstream = function(route, upstream, done) {
+UpstreamDB.prototype.removeUpstream = function (route, upstream, done) {
   if (!this.upstreams.hasOwnProperty(route)) {
     return save(done);
   }
@@ -53,7 +53,7 @@ UpstreamDB.prototype.removeUpstream = function(route, upstream, done) {
   this.save(done);
 };
 
-UpstreamDB.prototype.getRouteUpstream = function(route) {
+UpstreamDB.prototype.getRouteUpstream = function (route) {
   if (!this.upstreams.hasOwnProperty(route)) {
     this.upstreams[route] = [];
   }
@@ -61,13 +61,17 @@ UpstreamDB.prototype.getRouteUpstream = function(route) {
   return this.upstreams[route];
 };
 
-UpstreamDB.prototype.getAllUpstream = function() {
+UpstreamDB.prototype.getAllUpstream = function () {
   return this.upstreams;
 };
 
-UpstreamDB.prototype.nextUpstream = function(route) {
+UpstreamDB.prototype.nextUpstream = function (route) {
   if (!this.upstreams.hasOwnProperty(route) || this.upstreams[route].length == 0) {
-    route = '/';
+    if (!this.upstreams.hasOwnProperty('/') || this.upstreams['/'].length == 0) {
+      throw new Error('No upstream found for ' + route);
+    } else {
+      route = '/';
+    }
   }
 
   var upstreamList = this.upstreams[route];
@@ -78,7 +82,7 @@ UpstreamDB.prototype.nextUpstream = function(route) {
 
   var index = upstreamList.indexOf(currentUpstream);
   if (index < 0) {
-    throw new Error('No upstream found for ' + route );
+    index = 0;
   }
 
   index = (index + 1) % upstreamList.length;
@@ -88,7 +92,7 @@ UpstreamDB.prototype.nextUpstream = function(route) {
   return this.nexts[route];
 };
 
-UpstreamDB.prototype.save = function(done) {
+UpstreamDB.prototype.save = function (done) {
   var fs = require('fs');
 
   fs.writeFile(JSON_FILE, JSON.stringify(this.upstreams, null, 2), done);
