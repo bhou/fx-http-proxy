@@ -49,6 +49,7 @@ module.exports = function (options, imports, register) {
 
       var upstream = upstreamDB.nextUpstream(route);
 
+      logger.info('proxy to:', upstream);
       proxy.proxyRequest(req, res, {
         target: upstream
       });
