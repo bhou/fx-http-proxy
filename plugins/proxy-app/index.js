@@ -35,32 +35,29 @@ module.exports = function (options, imports, register) {
   var adminApi = new AdminApi(upstreamDB);
   upstreamDB.load(function () {
     var handler = function (req, res) {
-      logger.info(req.method, req.url);
-      var pathname = url.parse(req.url).pathname;
+      try {
+        logger.info(req.method, req.url);
+        var pathname = url.parse(req.url).pathname;
 
-      if (pathname.lastIndexOf('/proxy/add', 0) == 0) {
-        return adminApi.addUpstream(req, res);
-      } else if (pathname.lastIndexOf('/proxy/remove', 0) == 0) {
-        return adminApi.removeUpstream(req, res);
-      } else if (pathname.lastIndexOf('/proxy/upstream', 0) == 0) {
-        return adminApi.getUpstreams(req, res);
+        if (pathname.lastIndexOf('/proxy/add', 0) == 0) {
+          return adminApi.addUpstream(req, res);
+        } else if (pathname.lastIndexOf('/proxy/remove', 0) == 0) {
+          return adminApi.removeUpstream(req, res);
+        } else if (pathname.lastIndexOf('/proxy/upstream', 0) == 0) {
+          return adminApi.getUpstreams(req, res);
+        }
+
+        var route = '/' + pathname.split('/')[1];
+
+        var upstream = upstreamDB.nextUpstream(route);
+
+        logger.info('proxy to:', upstream, pathname);
+        proxy.proxyRequest(req, res, {
+          target: upstream
+        });
+      } catch (e) {
+        logger.error(e);
       }
-
-      var route = '/' + pathname.split('/')[1];
-
-      var upstream = upstreamDB.nextUpstream(route);
-
-      var s = pathname.split('/');
-      s.shift();
-      s.shift();
-      var s1 = s.join('/');
-      var newUrl = '/' + s1;
-      req.url = newUrl;
-      logger.info('proxy to:', upstream + newUrl);
-      proxy.proxyRequest(req, res, {
-        target: upstream
-      });
-
     };
 
 
