@@ -10,11 +10,7 @@
   },
   "plugin": {
     "consumes": [
-      "logger",
-      "express",
-      "webapp",
-      "server",
-      "middlewares"
+      "logger"
     ],
     "provides": []
   }

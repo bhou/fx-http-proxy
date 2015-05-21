@@ -1,88 +1,59 @@
 var http = require('http');
+var url = require('url');
 var httpProxy = require('http-proxy');
 
-var upstreams = {
-  "/path1": [
-    "127.0.0.1:8080"
-  ]
-};
-
-var ipHash = {};
-
-function removeRoute(app, route) {
-  for (var i = 0, len = app._router.stack.length; i < len; ++i) {
-    if (!app._router.stack[i].route) {
-      continue;
-    }
-
-    if (app._router.stack[i].route.path == route) {
-      app._router.stack[i].splice(i, 1);
-      return true;
-    }
-  }
-
-  return false;
-}
-
-function addUpstream(req, res, app, proxy, route, upstream) {
-  if (!upstreams.hasOwnProperty(route)) {
-    upstreams.route = [upstream];
-  }
-
-  if (!upstreams[route].hasOwnProperty(upstream)) {
-    upstreams[route].push(upstream);
-  }
-
-  app.all(route, function (req, res) {
-    // get ip
-    //var ip =
-
-    var upstreamList = upstreams[route];
-    for (var i = 0; i < upstreamList.length; i++) {
-      proxy.proxyRequest(req, res, {target: upstream});
-    }
-  });
-}
+var UpstreamDB = require('./upstreams');
 
 module.exports = function (options, imports, register) {
   // options
   var config = options.config || {
-      port: 80
+      port: 8080,
+      securePort: 433,
+      secure: false,
+      secureOnly: false
     };
 
   // imports
   var logger = imports.logger('Proxy');
-  var express = imports.express;
-  var server = imports.server;
-  var app = imports.webapp;
-  var middlewares = imports.middlewares;
-
   var proxy = httpProxy.createProxyServer({});
 
-  // apply global middlewares
-  for (var key in middlewares) {
-    if (middlewares.hasOwnProperty(key) && typeof middlewares[key] === 'function') {
-      app.use(middlewares[key]);
+  // init upstream
+  var upstreamDB = new UpstreamDB();
+  upstreamDB.load(function () {
+    var handler = function (req, res) {
+      var route = '/' + url.parse(req.url).pathname.split('/')[1];
+      console.log(route);
+      var upstream = upstreamDB.nextUpstream(route);
+      console.log(upstream);
+      proxy.proxyRequest(req, res, {
+        target: upstream
+      });
+    };
+
+
+    if (!config.secureOnly) {
+      var httpServer = http.createServer(handler).listen(config.port);
+      logger.info("HTTP: listening on port", config.port);
     }
-  }
 
-  /* add upstream */
-  app.post('/admin', function (req, res) {
-    var route = req.body.route;
-    var upstream = req.body.upstream;
-
-    removeRoute(app, route);
-    addUpstream(req, res, app, route, upstream);
-
-    res.end(JSON.stringify({
-      code: 200,
-      data: 'OK'
-    }))
+    if (config.secure) {
+      var httpsServer = http.createServer({}, handler).listen(config.securePort);
+      logger.info("HTTPS: listening on port", config.securePort);
+    }
   });
 
 
-  logger.info("listening on port", config.port);
-  server.listen(config.port);
+  http.createServer(function (req, res) {
+    res.end('Hello World 1! ' + req.url);
+  }).listen(8081);
+
+  http.createServer(function (req, res) {
+    res.end('Hello World 2! ' + req.url);
+  }).listen(8082);
+
+  http.createServer(function (req, res) {
+    res.end('Hello World 3! ' + req.url);
+  }).listen(8083);
 
   register(); // provides nothing
 };

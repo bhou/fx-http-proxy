@@ -8,10 +8,7 @@
   "dependencies": {
     "architect": "0.1.x",
     "http-proxy": "1.11.x",
-    "fx-logger": "0.1.x",
-    "fx-express": "0.1.x",
-    "fx-middleware": "0.1.x",
-    "fx-eventbus": "0.1.x"
+    "fx-logger": "0.1.x"
   },
   "debug": true
 }

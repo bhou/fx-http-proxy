@@ -5,14 +5,21 @@ var JSON_FILE = global.home + '/upstreams.json';
 
 function UpstreamDB() {
   this.upstreams = {};
+  this.nexts = {};
+
+  this.notFoundUpstream = 'http://localhost:8081';
 }
 
-UpstreamDB.prototype.load = function (done) {
+UpstreamDB.prototype.notFoundUpstream = function(upstream) {
+  this.notFoundUpstream = upstream;
+}
+
+UpstreamDB.prototype.load = function(done) {
   var self = this;
 
   var fs = require('fs');
 
-  fs.exists(JSON_FILE, function (exists) {
+  fs.exists(JSON_FILE, function(exists) {
     if (require.cache.hasOwnProperty(JSON_FILE)) {
       delete require.cache[require.resolve(JSON_FILE)];
     }
@@ -21,11 +28,11 @@ UpstreamDB.prototype.load = function (done) {
       self.upstreams = require(JSON_FILE);
     }
 
-    done();
+    self.save(done);
   });
 };
 
-UpstreamDB.prototype.addUpstream = function (route, upstream, done) {
+UpstreamDB.prototype.addUpstream = function(route, upstream, done) {
   if (!this.upstreams.hasOwnProperty(route)) {
     this.upstreams[route] = [];
   }
@@ -38,7 +45,7 @@ UpstreamDB.prototype.addUpstream = function (route, upstream, done) {
   save(done);
 };
 
-UpstreamDB.prototype.removeUpstream = function (route, upstream, done) {
+UpstreamDB.prototype.removeUpstream = function(route, upstream, done) {
   if (!this.upstreams.hasOwnProperty(route)) {
     return save(done);
   }
@@ -52,19 +59,42 @@ UpstreamDB.prototype.removeUpstream = function (route, upstream, done) {
   save(done);
 };
 
-UpstreamDB.prototype.getRouteUpstream = function (route) {
+UpstreamDB.prototype.getRouteUpstream = function(route) {
   if (!this.upstreams.hasOwnProperty(route)) {
-    return [];
+    this.upstreams[route] = [];
   }
 
   return this.upstreams[route];
 };
 
-UpstreamDB.prototype.getAllUpstream = function () {
+UpstreamDB.prototype.getAllUpstream = function() {
   return this.upstreams;
 };
 
-UpstreamDB.prototype.save = function (done) {
+UpstreamDB.prototype.nextUpstream = function(route) {
+  if (!this.upstreams.hasOwnProperty(route) || this.upstreams[route].length == 0) {
+    return this.notFoundUpstream;
+  }
+
+  var upstreamList = this.upstreams[route];
+  var currentUpstream = upstreamList[0];
+  if (this.nexts.hasOwnProperty(route)) {
+    currentUpstream = this.nexts[route];
+  }
+
+  var index = upstreamList.indexOf(currentUpstream);
+  if (index < 0) {
+    return this.notFoundUpstream;
+  }
+
+  index = (index + 1) % upstreamList.length;
+
+  this.nexts[route] = upstreamList[index];
+
+  return this.nexts[route];
+};
+
+UpstreamDB.prototype.save = function(done) {
   var fs = require('fs');
 
   fs.writeFile(JSON_FILE, JSON.stringify(this.upstreams, null, 2), done);
