@@ -36,7 +36,6 @@ module.exports = function (options, imports, register) {
   upstreamDB.load(function () {
     var handler = function (req, res) {
       try {
-        logger.info(req.method, req.url);
         var pathname = url.parse(req.url).pathname;
 
         if (pathname.lastIndexOf('/proxy/add', 0) == 0) {
@@ -51,7 +50,7 @@ module.exports = function (options, imports, register) {
 
         var upstream = upstreamDB.nextUpstream(route);
 
-        logger.info('proxy to:', upstream, pathname);
+        logger.info(req.method, req.url, '-->', upstream + req.url);
         proxy.proxyRequest(req, res, {
           target: upstream
         });

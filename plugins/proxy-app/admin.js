@@ -1,3 +1,5 @@
+var requestIp = require('request-ip');
+
 function AdminApi(upstreamDb) {
   this.upstreamDb = upstreamDb;
 }
@@ -5,22 +7,29 @@ function AdminApi(upstreamDb) {
 AdminApi.prototype.accept = function (req) {
   var os = require('os');
 
-  var ip = (req.headers['x-forwarded-for'] || '').split(',')[0]
-    || req.connection.remoteAddress;
+  var ip = requestIp.getClientIp(req);
 
   if (!ip) {
     return false;
   }
 
-  if (ip == '127.0.0.1' || ip.indexOf('127.0.0.1') != -1) {
+  if (ip == '127.0.0.1'
+    || ip == '::1'  // ipv6's 127.0.0.1
+    || ip.indexOf('127.0.0.1') != -1) {
     return true;
   }
 
   var networkInterfaces = os.networkInterfaces();
   for (var key in networkInterfaces) {
     if (networkInterfaces.hasOwnProperty(key)) {
-      if (networkInterfaces[key].address == ip) {
-        return true;
+      var interfaces = networkInterfaces[key];
+
+      for (var i = 0; i < interfaces.length; i++) {
+        if (interfaces[i].address == ip
+          || interfaces[i].address.indexOf(ip) != -1
+          || ip.indexOf(interfaces[i].address) != -1) {
+          return true;
+        }
       }
     }
   }
