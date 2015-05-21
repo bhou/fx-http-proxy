@@ -18,6 +18,17 @@ module.exports = function (options, imports, register) {
   var logger = imports.logger('Proxy');
   var proxy = httpProxy.createProxyServer({});
 
+  proxy.on('error', function (err, req, res) {
+    res.writeHead(500, {
+      'Content-Type': 'text/plain'
+    });
+
+    res.end(JSON.stringify({
+      code: 500,
+      data: 'Internal Error'
+    }));
+  });
+
   // init upstream
   var upstreamDB = new UpstreamDB();
   var adminApi = new AdminApi(upstreamDB);
@@ -61,6 +72,9 @@ module.exports = function (options, imports, register) {
       var httpsServer = http.createServer({}, handler).listen(config.securePort);
       logger.info("HTTPS: listening on port", config.securePort);
     }
+
+
+
   });
 
   register(); // provides nothing
