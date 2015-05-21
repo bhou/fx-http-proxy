@@ -34,6 +34,7 @@ module.exports = function (options, imports, register) {
   var adminApi = new AdminApi(upstreamDB);
   upstreamDB.load(function () {
     var handler = function (req, res) {
+      logger.info(req.method, req.url);
       var pathname = url.parse(req.url).pathname;
 
       if (pathname.lastIndexOf('/proxy/add', 0) == 0) {
