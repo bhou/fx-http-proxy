@@ -57,6 +57,14 @@ module.exports = function (options, imports, register) {
         });
       } catch (e) {
         logger.error(e);
+        res.writeHead(500, {
+          'Content-Type': 'text/plain'
+        });
+
+        res.end(JSON.stringify({
+          code: 500,
+          data: 'Internal Error'
+        }));
       }
     };
 
