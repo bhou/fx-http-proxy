@@ -59,7 +59,7 @@ AdminApi.prototype.addUpstream = function (req, res) {
     res.end(JSON.stringify({
       code: 200,
       data: 'OK'
-    }))
+    }));
   });
 };
 
@@ -106,13 +106,13 @@ AdminApi.prototype.getUpstreams = function (req, res) {
     return res.end(JSON.stringify({
       code: 200,
       data: self.upstreamDb.getAllUpstream()
-    }));
+    }, null, 4));
   }
 
   return res.end(JSON.stringify({
     code: 200,
     data: self.upstreamDb.getRouteUpstream(query.route)
-  }));
+  }, null, 4));
 };
 
 
