@@ -6,13 +6,7 @@ var JSON_FILE = global.home + '/upstreams.json';
 function UpstreamDB() {
   this.upstreams = {};
   this.nexts = {};
-
-  this.notFoundUpstream = 'http://localhost:8081';
 }
-
-UpstreamDB.prototype.notFoundUpstream = function(upstream) {
-  this.notFoundUpstream = upstream;
-};
 
 UpstreamDB.prototype.load = function(done) {
   var self = this;
@@ -73,7 +67,7 @@ UpstreamDB.prototype.getAllUpstream = function() {
 
 UpstreamDB.prototype.nextUpstream = function(route) {
   if (!this.upstreams.hasOwnProperty(route) || this.upstreams[route].length == 0) {
-    return this.notFoundUpstream;
+    return this.upstreams['/'];
   }
 
   var upstreamList = this.upstreams[route];
@@ -84,7 +78,7 @@ UpstreamDB.prototype.nextUpstream = function(route) {
 
   var index = upstreamList.indexOf(currentUpstream);
   if (index < 0) {
-    return this.notFoundUpstream;
+    return this.upstreams['/'];
   }
 
   index = (index + 1) % upstreamList.length;
