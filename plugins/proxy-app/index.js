@@ -1,5 +1,6 @@
 var http = require('http');
 var url = require('url');
+var path = require('path');
 var httpProxy = require('http-proxy');
 
 var UpstreamDB = require('./upstreams');
@@ -49,7 +50,12 @@ module.exports = function (options, imports, register) {
 
       var upstream = upstreamDB.nextUpstream(route);
 
-      logger.info('proxy to:', upstream);
+      var s = pathname.split('/');
+      s.shift();
+      s.shift();
+      var s1 = s.join('/');
+      var newUrl = '/' + s1;
+      logger.info('proxy to:', upstream + newUrl);
       proxy.proxyRequest(req, res, {
         target: upstream
       });
