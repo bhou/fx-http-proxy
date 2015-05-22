@@ -1,4 +1,5 @@
 var http = require('http');
+var https = require('https');
 var url = require('url');
 var path = require('path');
 var httpProxy = require('http-proxy');
@@ -10,10 +11,25 @@ module.exports = function (options, imports, register) {
   // options
   var config = options.config || {
       port: 8080,
-      securePort: 433,
+      securePort: 443,
       secure: false,
       secureOnly: false
     };
+
+  /* update config from arguments */
+  var argv = options.argv;
+  if (argv.port) {
+    config.port = argv.port;
+  }
+  if (argv.sp) {
+    config.securePort = argv.sp;
+  }
+  if (argv.es) {
+    config.secure = true;
+  }
+  if (argv.so) {
+    config.secureOnly = true;
+  }
 
   // imports
   var logger = imports.logger('Proxy');
@@ -74,7 +90,15 @@ module.exports = function (options, imports, register) {
     }
 
     if (config.secure) {
-      var httpsServer = http.createServer({}, handler).listen(config.securePort);
+      var fs = require('fs');
+      var hskey = fs.readFileSync(argv.key ? global.home + '/' + argv.key : global.home + '/key.pem');
+      var hscert = fs.readFileSync(argv.key ? global.home + '/' + argv.cert : global.home + '/cert.pem');
+
+      var credentials = {
+        key: hskey,
+        cert: hscert
+      };
+      var httpsServer = https.createServer(credentials, handler).listen(config.securePort);
       logger.info("HTTPS: listening on port", config.securePort);
     }
 
