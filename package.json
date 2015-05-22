@@ -1,12 +1,12 @@
 {
   "name": "fx-http-proxy",
   "version": "0.0.1",
-  "main": "./run.js",
+  "main": "./proxy.js",
   "engines": {
     "node": "0.10.*"
   },
   "dependencies": {
-    "architect": "0.1.x",
+    "fx-runtime": "0.1.x",
     "http-proxy": "1.11.x",
     "request-ip": "1.1.x",
     "fx-logger": "0.1.x"
