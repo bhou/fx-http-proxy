@@ -3,7 +3,11 @@
  */
 var JSON_FILE = global.home + '/upstreams.json';
 
-function UpstreamDB() {
+function UpstreamDB(fileName) {
+  if (fileName) {
+    JSON_FILE = global.home + '/' + fileName;
+  }
+
   this.upstreams = {};
   this.nexts = {};
 }

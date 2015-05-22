@@ -47,7 +47,7 @@ module.exports = function (options, imports, register) {
   });
 
   // init upstream
-  var upstreamDB = new UpstreamDB();
+  var upstreamDB = new UpstreamDB(argv.us);
   var adminApi = new AdminApi(upstreamDB);
   upstreamDB.load(function () {
     var handler = function (req, res) {
