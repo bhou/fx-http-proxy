@@ -7,6 +7,8 @@ var httpProxy = require('http-proxy');
 var UpstreamDB = require('./upstreams');
 var AdminApi = require('./admin');
 
+var handlerBuilder = require('./handlers');
+
 module.exports = function (options, imports, register) {
   // options
   var config = options.config || {
@@ -33,7 +35,7 @@ module.exports = function (options, imports, register) {
 
   // imports
   var logger = imports.logger('Proxy');
-  var proxy = httpProxy.createProxyServer({});
+  var proxy = httpProxy.createProxyServer({ws: true});
 
   proxy.on('error', function (err, req, res) {
     res.writeHead(500, {
@@ -46,46 +48,20 @@ module.exports = function (options, imports, register) {
     }));
   });
 
+
   // init upstream
   var upstreamDB = new UpstreamDB(argv.us);
   var adminApi = new AdminApi(upstreamDB);
+
+  var handlers = handlerBuilder(logger, proxy, adminApi, upstreamDB);
   upstreamDB.load(function () {
-    var handler = function (req, res) {
-      try {
-        var pathname = url.parse(req.url).pathname;
-
-        if (pathname.lastIndexOf('/proxy/add', 0) == 0) {
-          return adminApi.addUpstream(req, res);
-        } else if (pathname.lastIndexOf('/proxy/remove', 0) == 0) {
-          return adminApi.removeUpstream(req, res);
-        } else if (pathname.lastIndexOf('/proxy/upstream', 0) == 0) {
-          return adminApi.getUpstreams(req, res);
-        }
-
-        var route = '/' + pathname.split('/')[1];
-
-        var upstream = upstreamDB.nextUpstream(route);
-
-        logger.info(req.method, req.url, '-->', upstream + req.url);
-        proxy.proxyRequest(req, res, {
-          target: upstream
-        });
-      } catch (e) {
-        logger.error(e);
-        res.writeHead(500, {
-          'Content-Type': 'text/plain'
-        });
-
-        res.end(JSON.stringify({
-          code: 500,
-          data: 'Internal Error'
-        }));
-      }
-    };
+    var webHandler = handlers.webHandler;
+    var socketHandler = handlers.webSocketHandler;
 
 
     if (!config.secureOnly) {
-      var httpServer = http.createServer(handler).listen(config.port);
+      var httpServer = http.createServer(webHandler).listen(config.port);
+      httpServer.on('upgrade', socketHandler);
       logger.info("HTTP: listening on port", config.port);
     }
 
@@ -98,7 +74,7 @@ module.exports = function (options, imports, register) {
         key: hskey,
         cert: hscert
       };
-      var httpsServer = https.createServer(credentials, handler).listen(config.securePort);
+      var httpsServer = https.createServer(credentials, webHandler).listen(config.securePort);
       logger.info("HTTPS: listening on port", config.securePort);
     }
 
