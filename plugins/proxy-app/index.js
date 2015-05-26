@@ -53,17 +53,18 @@ module.exports = function (options, imports, register) {
   var upstreamDB = new UpstreamDB(argv.us);
   var adminApi = new AdminApi(upstreamDB);
 
-  var handlers = handlerBuilder(logger, proxy, adminApi, upstreamDB);
+  var handlers = handlerBuilder(logger, proxy, adminApi, upstreamDB, config);
   upstreamDB.load(function () {
     var webHandler = handlers.webHandler;
     var socketHandler = handlers.webSocketHandler;
 
 
-    if (!config.secureOnly) {
-      var httpServer = http.createServer(webHandler).listen(config.port);
-      httpServer.on('upgrade', socketHandler);
-      logger.info("HTTP: listening on port", config.port);
-    }
+    //if (!config.secureOnly) {
+    // always enable http server, will be redirect to https if enable secureOnly
+    var httpServer = http.createServer(webHandler).listen(config.port);
+    httpServer.on('upgrade', socketHandler);
+    logger.info("HTTP: listening on port", config.port);
+    //}
 
     if (config.secure) {
       var fs = require('fs');

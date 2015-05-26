@@ -3,9 +3,29 @@
  */
 var url = require('url');
 
-function getWebHandler(logger, proxy, adminApi, upstreamDB) {
+function getWebHandler(logger, proxy, adminApi, upstreamDB, config) {
   return function (req, res) {
     try {
+      if (config.secure && config.secureOnly) {  // enable secure, and secure only
+        // force https: redirect to https if protocol is http
+        if (!req.connection.encrypted) {
+          var hostname = null;
+          var parts = req.headers['host'].split(':');
+          if (parts.length > 1) {
+            hostname = parts[0] + ':' + config.securePort;
+          } else {
+            hostname = req.headers['host'] + ':' + config.securePort;
+          }
+
+          var secureTarget = "https://" + hostname + req.url;
+          logger.info('redirect to https -->', secureTarget);
+          res.writeHead(301,
+            {Location: secureTarget}
+          );
+          return res.end();
+        }
+      }
+
       var pathname = url.parse(req.url).pathname;
 
       if (pathname.lastIndexOf('/proxy/add', 0) == 0) {
@@ -39,7 +59,7 @@ function getWebHandler(logger, proxy, adminApi, upstreamDB) {
   }
 }
 
-function getWebSocketHandler(logger, proxy, upstreamDB) {
+function getWebSocketHandler(logger, proxy, upstreamDB, config) {
   return function (req, socket, head) {
     try {
       var pathname = url.parse(req.url).pathname;
@@ -59,9 +79,9 @@ function getWebSocketHandler(logger, proxy, upstreamDB) {
   }
 }
 
-module.exports = function (logger, proxy, adminApi, upstreamDB) {
+module.exports = function (logger, proxy, adminApi, upstreamDB, config) {
   return {
-    webHandler: getWebHandler(logger, proxy, adminApi, upstreamDB),
-    webSocketHandler: getWebSocketHandler(logger, proxy, upstreamDB)
+    webHandler: getWebHandler(logger, proxy, adminApi, upstreamDB, config),
+    webSocketHandler: getWebSocketHandler(logger, proxy, upstreamDB, config)
   }
 };
