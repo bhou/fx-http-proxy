@@ -5,6 +5,7 @@ var url = require('url');
 
 function getWebHandler(logger, proxy, adminApi, upstreamDB, config) {
   return function (req, res) {
+    var time = process.hrtime();
     try {
       if (config.secure && config.secureOnly) {  // enable secure, and secure only
         // force https: redirect to https if protocol is http
@@ -38,9 +39,10 @@ function getWebHandler(logger, proxy, adminApi, upstreamDB, config) {
 
       var route = '/' + pathname.split('/')[1];
 
-      var upstream = upstreamDB.nextUpstream(route);
+      var upstream = upstreamDB.nextUpstream(req.headers['host'], route);
 
-      logger.info(req.method, req.url, '-->', upstream + req.url);
+      var diff = process.hrtime(time);
+      logger.info(req.method, req.url, '-->', upstream + req.url, (diff[0] * 1e9 + diff[1]) / 1e6, 'ms');
       proxy.proxyRequest(req, res, {
         target: upstream
       });

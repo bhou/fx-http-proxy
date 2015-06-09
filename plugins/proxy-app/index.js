@@ -12,7 +12,7 @@ var handlerBuilder = require('./handlers');
 module.exports = function (options, imports, register) {
   // options
   var config = options.config || {
-      port: 8080,
+      port: 80,
       securePort: 443,
       secure: false,
       secureOnly: false
@@ -34,7 +34,7 @@ module.exports = function (options, imports, register) {
   }
 
   // imports
-  var logger = imports.logger('Proxy');
+  var logger = imports.logger.getLogger('Proxy');
   var proxy = httpProxy.createProxyServer({ws: true});
 
   proxy.on('error', function (err, req, res) {
@@ -59,17 +59,14 @@ module.exports = function (options, imports, register) {
     var socketHandler = handlers.webSocketHandler;
 
 
-    //if (!config.secureOnly) {
-    // always enable http server, will be redirect to https if enable secureOnly
     var httpServer = http.createServer(webHandler).listen(config.port);
     httpServer.on('upgrade', socketHandler);
     logger.info("HTTP: listening on port", config.port);
-    //}
 
     if (config.secure) {
       var fs = require('fs');
-      var hskey = fs.readFileSync(argv.key ? global.home + '/' + argv.key : global.home + '/key.pem');
-      var hscert = fs.readFileSync(argv.key ? global.home + '/' + argv.cert : global.home + '/cert.pem');
+      var hskey = fs.readFileSync(argv.key ? path.join(global.home, argv.key) : path.join(global.home, '/key.pem'));
+      var hscert = fs.readFileSync(argv.key ? path.join(global.home, argv.cert) : path.join(global.home, '/cert.pem'));
 
       var credentials = {
         key: hskey,
@@ -78,7 +75,6 @@ module.exports = function (options, imports, register) {
       var httpsServer = https.createServer(credentials, webHandler).listen(config.securePort);
       logger.info("HTTPS: listening on port", config.securePort);
     }
-
   });
 
   register(); // provides nothing
