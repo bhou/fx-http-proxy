@@ -68,7 +68,7 @@ function getWebSocketHandler(logger, proxy, upstreamDB, config) {
 
       var route = '/' + pathname.split('/')[1];
 
-      var upstream = upstreamDB.nextUpstream(route);
+      var upstream = upstreamDB.nextUpstream(req.headers['host'], route);
 
       logger.info('SOCK', req.url, '-->', upstream + req.url);
 
