@@ -35,10 +35,20 @@ UpstreamDB.prototype.load = function (done) {
   });
 };
 
-UpstreamDB.prototype.initDomains = function() {
+UpstreamDB.prototype.update = function (upstreams, done) {
   var self = this;
 
-  self.domains = self.sortKey(self.upstreams, true, function(value) {
+  self.upstreams = upstreams;
+
+  self.initDomains();
+
+  self.save(done);
+};
+
+UpstreamDB.prototype.initDomains = function () {
+  var self = this;
+
+  self.domains = self.sortKey(self.upstreams, true, function (value) {
     return self.sortKey(value, false, null);
   });
 };

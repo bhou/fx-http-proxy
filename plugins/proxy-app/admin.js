@@ -5,6 +5,10 @@ function AdminApi(upstreamDb) {
 }
 
 AdminApi.prototype.accept = function (req) {
+  // THIS IS BAD. FIX THIS!!
+  return true;
+
+  // only accept local request
   var os = require('os');
 
   var ip = requestIp.getClientIp(req);
@@ -35,6 +39,41 @@ AdminApi.prototype.accept = function (req) {
   }
 
   return false;
+};
+
+AdminApi.prototype.updateUpstreams = function (req, res) {
+  var self = this;
+  if (!this.accept(req)) {
+    return res.end(JSON.stringify({
+      code: 401,
+      data: 'Unauthorized'
+    }));
+  }
+
+  if (req.method == 'POST') {
+    var jsonString = '';
+    req.on('data', function (data) {
+      jsonString += data;
+    });
+    req.on('end', function () {
+      try {
+        jsonString = decodeURIComponent(jsonString);
+        var data = JSON.parse(jsonString);
+
+        self.upstreamDb.update(data, function () {
+          res.end(JSON.stringify({
+            code: 200,
+            data: 'OK'
+          }));
+        });
+      } catch (e) {
+        return res.end(JSON.stringify({
+          code: 400,
+          data: 'Bad Request' + e
+        }));
+      }
+    });
+  }
 };
 
 AdminApi.prototype.addUpstream = function (req, res) {

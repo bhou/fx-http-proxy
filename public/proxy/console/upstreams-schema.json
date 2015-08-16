@@ -1,0 +1,39 @@
+{
+  "definitions": {
+    "subdomain": {
+      "type": "object",
+      "properties": {
+        "www": {"$ref": "#/definitions/path"}
+      },
+      "additionalProperties": {"$ref": "#/definitions/path"}
+    },
+    "path": {
+      "type": "object",
+      "properties": {
+        "/": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Upstreams",
+  "description": "fxwavelet http proxy upstreams",
+  "type": "object",
+  "properties": {
+    "*": {"$ref": "#/definitions/subdomain"}
+  },
+  "additionalProperties": {
+    "$ref": "#/definitions/subdomain"
+  },
+  "required": ["*"]
+}

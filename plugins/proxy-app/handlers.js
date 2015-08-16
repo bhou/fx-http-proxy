@@ -2,8 +2,15 @@
  * Created by B.HOU on 5/26/2015.
  */
 var url = require('url');
+var finalhandler = require("finalhandler");
+var serveStatic = require('serve-static');
+var userinfo = null;
+
 
 function getWebHandler(logger, proxy, adminApi, upstreamDB, config) {
+  // Serve up public folder
+  var serve = serveStatic('./public', {'index': ['index.html', 'index.htm']})
+
   return function (req, res) {
     var time = process.hrtime();
     try {
@@ -35,6 +42,14 @@ function getWebHandler(logger, proxy, adminApi, upstreamDB, config) {
         return adminApi.removeUpstream(req, res);
       } else if (pathname.lastIndexOf('/proxy/upstream', 0) == 0) {
         return adminApi.getUpstreams(req, res);
+      } else if (pathname.lastIndexOf('/proxy/update', 0) == 0) {
+        return adminApi.updateUpstreams(req, res);
+      } else if (pathname.lastIndexOf('/proxy/console', 0) == 0) {
+        // check authorization header
+        return basicAuth(req, res, function() {
+          var done = finalhandler(req, res)
+          return serve(req, res, done);
+        });
       }
 
       var route = '/' + pathname.split('/')[1];
@@ -55,7 +70,7 @@ function getWebHandler(logger, proxy, adminApi, upstreamDB, config) {
 
       res.end(JSON.stringify({
         code: 500,
-        data: 'Internal Error'
+        data: 'Proxy Error: please verify your request'
       }));
     }
   }
@@ -79,6 +94,32 @@ function getWebSocketHandler(logger, proxy, upstreamDB, config) {
       logger.error(e);
     }
   }
+}
+
+function basicAuth(req, res, done) {
+  if (!userinfo) {
+    userinfo = require('./utils').loadUserInfo(__dirname + '/../../users.htpasswd');
+  }
+
+  if (!req.headers || !req.headers.hasOwnProperty('authorization')) {
+    return requestBasicAuth(res);
+  }
+
+  var token = req.headers["authorization"];
+
+  if (userinfo.tokens.indexOf(token) >= 0) {
+    done();
+  } else {
+    return requestBasicAuth(res);
+  }
+}
+
+function requestBasicAuth(res) {
+  res.writeHead(401, {
+    "WWW-Authenticate": 'Basic realm="fx http proxy"'
+  });
+
+  res.end("Unauthorized");
 }
 
 module.exports = function (logger, proxy, adminApi, upstreamDB, config) {

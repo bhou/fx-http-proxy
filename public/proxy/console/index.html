@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>f(x) HTTP Proxy Admin Console</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.2/css/foundation.min.css" rel="stylesheet"
+          type="text/css"/>
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="/proxy/console/js/jsoneditor.js"></script>
+</head>
+<body>
+<div class="row">
+    <div id="json-editor" class="large-8 columns">
+    </div>
+    <div class="large-4 columns">
+        <h3>Upstream List</h3>
+        <div class="panel">
+            <ul id="upstream-list">
+            </ul>
+        </div>
+        <div>
+            <a id="update-upstreams" href="#" class="button">Submit</a>
+        </div>
+    </div>
+</div>
+<div class="row">
+</div>
+
+</body>
+
+<script src="/proxy/console/js/proxy.js"></script>
+</html>

@@ -9,7 +9,10 @@
     "fx-runtime": "0.1.x",
     "http-proxy": "1.11.x",
     "request-ip": "1.1.x",
-    "fx-logger": "0.1.x"
+    "fx-logger": "0.1.x",
+    "finalhandler": "0.4.x",
+    "serve-static": "1.10.x",
+    "http-auth": "2.2.x"
   },
   "debug": true
 }
