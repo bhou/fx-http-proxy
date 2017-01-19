@@ -61,15 +61,15 @@ module.exports = function (options, imports, register) {
     var le = require('letsencrypt').create({ server: 'staging' });
 
     var opts = {
-      domains: ['localhost'], email: 'bo.hou@oobabyshop.com', agreeTos: true
+      domains: ['oobabyshop.com', 'oobaby.com.cn'], email: 'plxpls.info@gmail.com', agreeTos: true
     };
 
-    /*le.register(opts).then(function (certs) {
+    le.register(opts).then(function (certs) {
       console.log(certs);
       // privkey, cert, chain, expiresAt, issuedAt, subject, altnames
     }, function (err) {
       console.error(err);
-    });*/
+    });
 
     var httpServer = http.createServer(le.middleware(webHandler)).listen(config.port);
     httpServer.on('upgrade', socketHandler);
