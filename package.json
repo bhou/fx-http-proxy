@@ -13,6 +13,7 @@
     "http-proxy": "1.11.x",
     "letsencrypt": "^2.1.8",
     "letsencrypt-express": "^2.0.6",
+    "redirect-https": "^1.1.1",
     "request-ip": "1.1.x",
     "serve-static": "1.10.x"
   },

@@ -58,19 +58,33 @@ module.exports = function (options, imports, register) {
     var webHandler = handlers.webHandler;
     var socketHandler = handlers.webSocketHandler;
 
-    var le = require('letsencrypt').create({ server: 'staging' });
+    function approveDomains(opts, certs, cb) {
+      if (certs) {
+        opts.domains = ['oobabyshop.com', 'oobaby.com.cn']; //certs.altnames;
+      }
+      else {
+        opts.email = 'plxpls.info@gmail.com';
+        opts.agreeTos = true;
+      }
 
-    var opts = {
-      domains: ['oobabyshop.com', 'oobaby.com.cn'], email: 'plxpls.info@gmail.com', agreeTos: true
-    };
+      cb(null, { options: opts, certs: certs });
+    }
 
-    le.register(opts).then(function (certs) {
-      console.log(certs);
-      // privkey, cert, chain, expiresAt, issuedAt, subject, altnames
-    }, function (err) {
-      console.error(err);
+    var lex = require('letsencrypt-express').create({
+      server: 'staging'
+      , approveDomains: approveDomains
     });
 
+    var httpServer = http.createServer(lex.middleware(require('redirect-https')())).listen(config.port);
+    httpServer.on('upgrade', socketHandler);
+    logger.info("HTTP: listening on port", config.port);
+
+    var httpsServer = https.createServer(lex.httpsOptions, lex.middleware(webHandler)).listen(config.securePort, function () {
+      console.log("Listening for ACME tls-sni-01 challenges and serve app on", config.securePort);
+    });
+    httpsServer.on('upgrade', socketHandler);
+
+    /*
     var httpServer = http.createServer(le.middleware(webHandler)).listen(config.port);
     httpServer.on('upgrade', socketHandler);
     logger.info("HTTP: listening on port", config.port);
@@ -78,6 +92,7 @@ module.exports = function (options, imports, register) {
     var httpsServer = https.createServer(le.middleware(webHandler)).listen(config.securePort);
     httpsServer.on('upgrade', socketHandler);
     logger.info("HTTPS: listening on port", config.securePort);
+    */
 
     /*if (config.secure) {
       var fs = require('fs');
