@@ -58,12 +58,28 @@ module.exports = function (options, imports, register) {
     var webHandler = handlers.webHandler;
     var socketHandler = handlers.webSocketHandler;
 
+    var le = require('letsencrypt').create({ server: 'staging' });
 
-    var httpServer = http.createServer(webHandler).listen(config.port);
+    var opts = {
+      domains: ['localhost'], email: 'bo.hou@oobabyshop.com', agreeTos: true
+    };
+
+    /*le.register(opts).then(function (certs) {
+      console.log(certs);
+      // privkey, cert, chain, expiresAt, issuedAt, subject, altnames
+    }, function (err) {
+      console.error(err);
+    });*/
+
+    var httpServer = http.createServer(le.middleware(webHandler)).listen(config.port);
     httpServer.on('upgrade', socketHandler);
     logger.info("HTTP: listening on port", config.port);
 
-    if (config.secure) {
+    var httpsServer = https.createServer(le.middleware(webHandler)).listen(config.securePort);
+    httpsServer.on('upgrade', socketHandler);
+    logger.info("HTTPS: listening on port", config.securePort);
+
+    /*if (config.secure) {
       var fs = require('fs');
       var hskey = fs.readFileSync(argv.key ? path.join(global.home, argv.key) : path.join(global.home, '/key.pem'));
       var hscert = fs.readFileSync(argv.key ? path.join(global.home, argv.cert) : path.join(global.home, '/cert.pem'));
@@ -74,7 +90,7 @@ module.exports = function (options, imports, register) {
       };
       var httpsServer = https.createServer(credentials, webHandler).listen(config.securePort);
       logger.info("HTTPS: listening on port", config.securePort);
-    }
+    }*/
   });
 
   register(); // provides nothing
