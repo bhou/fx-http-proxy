@@ -54,12 +54,12 @@ module.exports = function (options, imports, register) {
   var proxy = httpProxy.createProxyServer({ws: true});
 
   proxy.on('error', function (err, req, res) {
-    res.writeHead(500, {
+    res.writeHead(err.statusCode || 500, {
       'Content-Type': 'text/plain'
     });
 
     res.end(JSON.stringify({
-      code: 500,
+      code: err.statusCode || 500,
       data: 'Internal Error'
     }));
   });
@@ -106,7 +106,7 @@ module.exports = function (options, imports, register) {
       logger.info("HTTP: listening on port", config.port);
 
       var httpsServer = https.createServer(lex.httpsOptions, lex.middleware(webHandler)).listen(config.securePort, function () {
-        console.log("Listening for ACME tls-sni-01 challenges and serve app on", config.securePort);
+        logger.info("Listening for ACME tls-sni-01 challenges and serve app on", config.securePort);
       });
       httpsServer.on('upgrade', socketHandler);
     } else {

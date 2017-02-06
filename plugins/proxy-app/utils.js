@@ -1,4 +1,4 @@
-var fs = require('fs');
+const fs = require('fs');
 
 module.exports = {
   loadUserInfo: function (file) {
@@ -19,5 +19,19 @@ module.exports = {
       users: users,
       tokens: tokens
     };
+  },
+
+  buildUrl: function(req, path) {
+    let protocol = req.connection.encrypted ? 'https://' : 'http://';
+    let hostname = req.headers.host;
+
+    return `${protocol}${hostname}${path}`;
+  },
+
+  redirect: function(res, url) {
+    res.writeHead(301,
+      {Location: url}
+    );
+    return res.end();
   }
 };

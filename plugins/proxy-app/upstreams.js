@@ -192,22 +192,29 @@ UpstreamDB.prototype.nextUpstream = function (host, route) {
 UpstreamDB.prototype.internalNextUpstream = function (domain, subdomain, route) {
   if (!this.upstreams.hasOwnProperty(domain)) {
     if (!this.upstreams.hasOwnProperty('*')) {
-      throw new Error('No upstream defined for ' + domain);
+      let error = new Error('No upstream defined for ' + domain);
+      error.statusCode = 404;
+      throw error;
     }
     domain = '*';
   }
 
   if (!this.upstreams[domain].hasOwnProperty(subdomain)) {
     if (!this.upstreams[domain].hasOwnProperty('www')) {
-      throw new Error('No upstream defined for ' + subdomain + '.' + domain);
+      let error = new Error('No upstream defined for ' + subdomain + '.' + domain);
+      error.statusCode = 404;
+      throw error;
     }
     subdomain = 'www';
   }
 
-
-  if (!this.upstreams[domain][subdomain].hasOwnProperty(route) || this.upstreams[domain][subdomain][route].length == 0) {
-    if (!this.upstreams[domain][subdomain].hasOwnProperty('/') || this.upstreams[domain][subdomain]['/'].length == 0) {
-      throw new Error('No upstream found for ' + subdomain + '.' + domain + route);
+  if (!this.upstreams[domain][subdomain].hasOwnProperty(route) 
+      || this.upstreams[domain][subdomain][route].length == 0) {
+    if (!this.upstreams[domain][subdomain].hasOwnProperty('/') 
+        || this.upstreams[domain][subdomain]['/'].length == 0) {
+      let error = new Error('No upstream found for ' + subdomain + '.' + domain + route);
+      error.statusCode = 404;
+      throw error;
     } else {
       route = '/';
     }

@@ -4,6 +4,7 @@
 var url = require('url');
 var finalhandler = require("finalhandler");
 var serveStatic = require('serve-static');
+var utils = require('./utils');
 var userinfo = null;
 
 
@@ -14,6 +15,7 @@ function getWebHandler(logger, proxy, adminApi, upstreamDB, config) {
   return function (req, res) {
     var time = process.hrtime();
     try {
+      // this is handled by letsencrypt lib, keep the code here in case you dont want to use letsencrypt
       if (config.secure && config.secureOnly) {  // enable secure, and secure only
         // force https: redirect to https if protocol is http
         if (!req.connection.encrypted) {
@@ -47,10 +49,9 @@ function getWebHandler(logger, proxy, adminApi, upstreamDB, config) {
       } else if (pathname.lastIndexOf('/proxy/console', 0) == 0) {
         // check authorization header
         return basicAuth(req, res, function() {
-          var done = finalhandler(req, res)
-          return serve(req, res, done);
+          return serve(req, res, finalhandler(req, res));
         });
-      }
+      } 
 
       var route = '/' + pathname.split('/')[1];
 
@@ -64,14 +65,28 @@ function getWebHandler(logger, proxy, adminApi, upstreamDB, config) {
 
     } catch (e) {
       logger.error(e);
-      res.writeHead(500, {
+      res.writeHead(e.statusCode || 500, {
         'Content-Type': 'text/plain'
       });
 
+      let data = null;
+      switch (e.statusCode) {
+        case 404:
+          data = 'Not found!';
+          break;
+        case 401:
+          data = 'Unauthorized!';
+          break;
+        default:
+          data = 'Proxy Error: please verify your request';
+          break;
+      }
+
       res.end(JSON.stringify({
-        code: 500,
-        data: 'Proxy Error: please verify your request'
+        code: e.statusCode || 500,
+        data: data,
       }));
+
     }
   }
 }
