@@ -9,6 +9,7 @@
     "finalhandler": "0.4.x",
     "fx-logger": "0.1.x",
     "fx-runtime": "0.1.x",
+    "greenlock-express": "^2.0.10",
     "http-auth": "2.2.x",
     "http-proxy": "1.11.x",
     "letsencrypt": "^2.1.8",

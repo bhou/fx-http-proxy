@@ -99,7 +99,7 @@ module.exports = function (options, imports, register) {
       };
       logger.info('letsencrypt option - server:', lexOpt.server);
       logger.info('letsencrypt option - approvedDomains:', config.domains);
-      var lex = require('letsencrypt-express').create(lexOpt);
+      var lex = require('greenlock-express').create(lexOpt);
 
       var httpServer = http.createServer(lex.middleware(require('redirect-https')())).listen(config.port);
       httpServer.on('upgrade', socketHandler);
