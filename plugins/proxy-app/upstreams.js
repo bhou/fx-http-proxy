@@ -21,9 +21,9 @@ UpstreamDB.prototype.load = function (done) {
   var fs = require('fs');
 
   fs.exists(JSON_FILE, function (exists) {
-    if (require.cache.hasOwnProperty(JSON_FILE)) {
-      delete require.cache[require.resolve(JSON_FILE)];
-    }
+    //if (require.cache.hasOwnProperty(JSON_FILE)) {
+    delete require.cache[require.resolve(JSON_FILE)];
+    //}
 
     if (exists) {
       self.upstreams = require(JSON_FILE);
