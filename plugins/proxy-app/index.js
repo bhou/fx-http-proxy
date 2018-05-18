@@ -94,7 +94,8 @@ module.exports = function (options, imports, register) {
       }
 
       var lexOpt = {
-        server: config.prod ? 'https://acme-v01.api.letsencrypt.org/directory' : 'staging', 
+        // server: config.prod ? 'https://acme-v01.api.letsencrypt.org/directory' : 'staging', 
+        server: config.prod ? 'https://acme-v02.api.letsencrypt.org/directory' : 'https://acme-staging-v02.api.letsencrypt.org/directory',
         approveDomains: approveDomains
       };
       logger.info('letsencrypt option - server:', lexOpt.server);
